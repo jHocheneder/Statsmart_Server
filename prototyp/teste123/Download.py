@@ -7,8 +7,12 @@ import numpy as np
 url = "https://data.ooe.gv.at/files/cms/Mediendateien/OGD/ogd_abtStat/Haushalte_seit_1971.csv"
 
 csv_data = requests.get(url).content
-df = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";", usecols=["Jahr", "Gemeinde", "durchschn_HHG"])
+df = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
 print(df.head())
+
+print(df.columns)
+
+
 
 # fig, ax = plt.subplots()
 #
