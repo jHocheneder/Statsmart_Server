@@ -1,18 +1,45 @@
 import requests
 import pandas as pd
 import io
+import seaborn as sns
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.stats.stats import pearsonr
 
-url = "https://data.ooe.gv.at/files/cms/Mediendateien/OGD/ogd_abtStat/Haushalte_seit_1971.csv"
+url1 = "https://data.linz.gv.at/katalog/tourismus/kategorien/3_stern_beherbergungsbetriebe/2019/t3ges_2019.csv"
+url2 = "https://data.linz.gv.at/katalog/wirtschaft/arbeitslose/2019/Arbsu_2019.csv"
 
-csv_data = requests.get(url).content
-df = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
-print(df.head())
-
-print(df.columns)
+csv_data = requests.get(url1).content
+df1 = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
 
 
+csv_data = requests.get(url2).content
+df2 = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
+
+
+df2.rename(columns={
+    'Monate': 'Monat'
+}, inplace=True)
+
+df = df1.merge(df2, on='Monat')
+
+
+correlation_mat = df.corr()
+
+sns.heatmap(correlation_mat, annot=True)
+# plt.show()
+
+corr_pairs = correlation_mat.unstack()
+sorted_pairs = corr_pairs.sort_values(kind="quicksort")
+
+negative_pairs = sorted_pairs[sorted_pairs < 0]
+strong_pairs = sorted_pairs[abs(sorted_pairs) > 0.5]
+
+print(strong_pairs)
+
+# df_result = pd.concat([df1, df2], axis=0)
+#
+# print(df_result.columns)
 
 # fig, ax = plt.subplots()
 #
