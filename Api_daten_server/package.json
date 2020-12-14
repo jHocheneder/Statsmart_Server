@@ -19,6 +19,7 @@
   },
   "dependencies": {
     "cheerio": "^0.22.0",
+    "cors": "^2.8.5",
     "json2csv": "^5.0.5"
   }
 }
