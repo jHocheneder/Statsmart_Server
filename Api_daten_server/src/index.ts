@@ -19,6 +19,7 @@ AxiosInstance.get(url)
 
 import axios from 'axios';
 import { Link } from './class/link';
+import { DownloadLink } from './class/downloadLink';
 const cheerio = require('cheerio')
 const $ = cheerio.load('<h2 class="title">Hello world</h2>')
 
@@ -37,13 +38,8 @@ let download: Link[] = [];
 var server = express();
 
 server.use(express.json());
-
-server.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin", '*');
-  res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-  res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
-  next();
-});
+var cors = require('cors')
+server.use(cors())
 
 const port = 8080;
 
@@ -75,7 +71,7 @@ AxiosInstance.get(url)
 server.get('/api/getLinks', (req, res) =>{
   res.send(links)
 });
-let a
+
 server.get('/api/downloadLinks/:id', async (req, res) =>{
   const resUrl = 'https://www.data.gv.at'+links[req.params.id].link
 
@@ -89,23 +85,23 @@ server.get('/api/downloadLinks/:id', async (req, res) =>{
         download = [];
 
         searchResults2.each((i, elem) => {
-            var link = new Link();
+            var link = new DownloadLink();
             link.id = i;
             link.link = $(elem).find('a').attr('href')
             link.title = $(elem).find('a').attr('title')
+            link.type = $(elem).find('span').html()
             download.push(link)
         })
         
         res.send(download)
         
-        console.log(download)
     }
   )
   .catch(console.error);
 });
 
 
-server.get('/api/download/', (req, res) =>{
+server.post('/api/download/', (req, res) =>{
   const resUrl = 'https://www.data.gv.at'+req.body.link
   console.log(resUrl)
   AxiosInstance.get(resUrl)

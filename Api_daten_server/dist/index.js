@@ -30,6 +30,7 @@ AxiosInstance.get(url)
   .catch(console.error);*/
 const axios_1 = __importDefault(require("axios"));
 const link_1 = require("./class/link");
+const downloadLink_1 = require("./class/downloadLink");
 const cheerio = require('cheerio');
 const $ = cheerio.load('<h2 class="title">Hello world</h2>');
 const url = 'https://www.data.gv.at/suche/?sort=abc'; // URL we're scraping
@@ -40,12 +41,8 @@ let download = [];
 // Send an async HTTP Get request to the url
 var server = express_1.default();
 server.use(express_1.default.json());
-server.use(function (req, res, next) {
-    res.header("Access-Control-Allow-Origin", '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.header("Access-Control-Allow-Headers", 'Origin,X-Requested-With,Content-Type,Accept,content-type,application/json');
-    next();
-});
+var cors = require('cors');
+server.use(cors());
 const port = 8080;
 server.listen(port, function () {
     console.log('API is listening on port ' + port);
@@ -70,7 +67,6 @@ AxiosInstance.get(url)
 server.get('/api/getLinks', (req, res) => {
     res.send(links);
 });
-let a;
 server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const resUrl = 'https://www.data.gv.at' + links[req.params.id].link;
     AxiosInstance.get(resUrl)
@@ -80,18 +76,18 @@ server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, voi
         const searchResults2 = selector2("body").find(".resource-list > .resource-item");
         download = [];
         searchResults2.each((i, elem) => {
-            var link = new link_1.Link();
+            var link = new downloadLink_1.DownloadLink();
             link.id = i;
             link.link = $(elem).find('a').attr('href');
             link.title = $(elem).find('a').attr('title');
+            link.type = $(elem).find('span').html();
             download.push(link);
         });
         res.send(download);
-        console.log(download);
     })
         .catch(console.error);
 }));
-server.get('/api/download/', (req, res) => {
+server.post('/api/download/', (req, res) => {
     const resUrl = 'https://www.data.gv.at' + req.body.link;
     console.log(resUrl);
     AxiosInstance.get(resUrl)
