@@ -17,11 +17,9 @@ csv_data = requests.get(url2).content
 df2 = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
 
 
-df2.rename(columns={
-    'Monate': 'Monat'
-}, inplace=True)
+df = df1.merge(df2, how='inner', left_on=df1.columns[0], right_on=df2.columns[0])
 
-df = df1.merge(df2, on='Monat')
+#dfTest = df1.merge(df, on='Mona*')
 
 
 correlation_mat = df.corr()
@@ -33,9 +31,31 @@ corr_pairs = correlation_mat.unstack()
 sorted_pairs = corr_pairs.sort_values(kind="quicksort")
 
 negative_pairs = sorted_pairs[sorted_pairs < 0]
-strong_pairs = sorted_pairs[abs(sorted_pairs) > 0.5]
+strong_pairs = sorted_pairs[abs(sorted_pairs) > 0.9]
+strong_pairs = strong_pairs[:-(len(df.columns)-1)]
 
-print(strong_pairs)
+#print(strong_pairs)
+
+keys = strong_pairs.keys()
+
+firstKey = keys[len(keys)-1][0]
+secondKey = keys[len(keys)-1][1]
+
+xKey = 'Monat'
+
+#print(firstKey + '\n' + secondKey)
+
+dfDraw = df[[firstKey, secondKey, xKey]]
+
+dfDraw.plot.line()
+plt.show()
+
+# dfDraw = pd.DataFrame({
+#     'first': df[firstKey],
+#     'second': df[secondKey]
+# }, index=df[yKey])
+#
+# print(dfDraw)
 
 # df_result = pd.concat([df1, df2], axis=0)
 #

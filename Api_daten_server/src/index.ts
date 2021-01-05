@@ -1,4 +1,5 @@
 import express from 'express';
+import * as mariadb from 'mariadb';
 
 console.log('Project setup correctly!')
 
@@ -61,6 +62,13 @@ let download: Link[] = [];
 
 // Send an async HTTP Get request to the url
 
+const pool: mariadb.Pool = mariadb.createPool({
+  host: '195.128.100.64',
+  user: 'statsmart',
+  password: 'Statsmart_01',
+  database: 'statsmart',
+  connectionLimit: 15
+});
 var server = express();
 
 server.use(express.json());
@@ -96,6 +104,17 @@ AxiosInstance.get(url)
 
 server.get('/api/getLinks', (req, res) =>{
   res.send(links)
+});
+
+server.post('/api/saveStatistic', async (req, res) => {
+  try {
+    let x = await pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)",
+      [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, req.body.userId])
+    
+    res.send(x)
+  } catch (ex) {
+    res.send("error in saveStatistic \n" + ex)
+  }
 });
 
 server.get('/api/downloadLinks/:id', async (req, res) =>{
