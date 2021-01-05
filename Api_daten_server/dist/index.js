@@ -137,4 +137,6 @@ server.post('/api/downloadcsv/', (req, res) => {
     })
         .catch(console.error);
 });
+server.post('/api/insertstatistic/', (req, res) => {
+});
 //# sourceMappingURL=index.js.map
