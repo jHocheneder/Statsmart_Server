@@ -125,6 +125,15 @@ server.post('/api/saveStatistic', (req, res) => __awaiter(void 0, void 0, void 0
         res.send("error in saveStatistic \n" + ex);
     }
 }));
+server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let x = yield pool.query("select * from Statistik");
+        res.send(x);
+    }
+    catch (ex) {
+        res.send("error in findAllStatistic \n" + ex);
+    }
+}));
 server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const resUrl = 'https://www.data.gv.at' + links[req.params.id].link;
     AxiosInstance.get(resUrl)

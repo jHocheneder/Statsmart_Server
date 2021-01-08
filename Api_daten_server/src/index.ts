@@ -117,6 +117,16 @@ server.post('/api/saveStatistic', async (req, res) => {
   }
 });
 
+server.get('/api/findAllStatistic', async (req, res) => {
+  try {
+    let x = await pool.query("select * from Statistik")
+
+    res.send(x)
+  } catch (ex) {
+    res.send("error in findAllStatistic \n" + ex)
+  }
+})
+
 server.get('/api/downloadLinks/:id', async (req, res) =>{
   const resUrl = 'https://www.data.gv.at'+links[req.params.id].link
 
