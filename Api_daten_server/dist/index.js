@@ -134,6 +134,24 @@ server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void
         res.send("error in findAllStatistic \n" + ex);
     }
 }));
+server.put('/api/updateRating', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let x = yield pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", [req.body.rating, req.body.statistikid, req.body.userid]);
+        res.send(x);
+    }
+    catch (ex) {
+        res.send("error in updateRating \n" + ex);
+    }
+}));
+server.post('/api/createRating', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let x = yield pool.query("insert into Rating Value (?, ?, ?, ?)", [null, req.body.userid, req.body.statistikid, req.body.rating]);
+        res.send(x);
+    }
+    catch (ex) {
+        res.send("error in createRating \n" + ex);
+    }
+}));
 server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const resUrl = 'https://www.data.gv.at' + links[req.params.id].link;
     AxiosInstance.get(resUrl)

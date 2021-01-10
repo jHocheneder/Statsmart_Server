@@ -127,6 +127,28 @@ server.get('/api/findAllStatistic', async (req, res) => {
   }
 })
 
+server.put('/api/updateRating', async (req, res) => {
+  try {
+    let x = await pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", 
+      [req.body.rating, req.body.statistikid, req.body.userid])
+
+    res.send(x)
+  } catch (ex) {
+    res.send("error in updateRating \n" + ex)
+  }
+})
+
+server.post('/api/createRating', async (req, res) => {
+  try {
+    let x = await pool.query("insert into Rating Value (?, ?, ?, ?)",
+      [null, req.body.userid, req.body.statistikid, req.body.rating])
+
+    res.send(x)
+  } catch (ex) {
+    res.send("error in createRating \n" + ex)
+  }
+})
+
 server.get('/api/downloadLinks/:id', async (req, res) =>{
   const resUrl = 'https://www.data.gv.at'+links[req.params.id].link
 
