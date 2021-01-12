@@ -134,6 +134,15 @@ server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void
         res.send("error in findAllStatistic \n" + ex);
     }
 }));
+server.get('/api/clearAllStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let x = yield pool.query("delete from Statistik");
+        res.send(x);
+    }
+    catch (ex) {
+        res.send("error in clearAllStatistic \n" + ex);
+    }
+}));
 server.put('/api/updateRating', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         let x = yield pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", [req.body.rating, req.body.statistikid, req.body.userid]);

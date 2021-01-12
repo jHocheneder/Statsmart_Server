@@ -127,6 +127,16 @@ server.get('/api/findAllStatistic', async (req, res) => {
   }
 })
 
+server.get('/api/clearAllStatistic', async (req, res) => {
+  try {
+    let x = await pool.query("delete from Statistik")
+
+    res.send(x)
+  } catch (ex) {
+    res.send("error in clearAllStatistic \n" + ex)
+  }
+})
+
 server.put('/api/updateRating', async (req, res) => {
   try {
     let x = await pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", 
