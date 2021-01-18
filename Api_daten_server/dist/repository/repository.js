@@ -55,7 +55,7 @@ class Repository {
     createUser(user) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let x = yield this.pool.query("INSERT INTO sender VALUE (?, ?, ?, ?)", [null, user.email, user.password, user.username]);
+                let x = yield this.pool.query("INSERT INTO User VALUE (?, ?, ?, ?)", [null, user.email, user.password, user.username]);
                 return x;
             }
             catch (ex) {

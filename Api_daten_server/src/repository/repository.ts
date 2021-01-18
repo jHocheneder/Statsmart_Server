@@ -24,7 +24,7 @@ export class Repository {
 
     public async createUser(user){
         try {
-            let x = await this.pool.query("INSERT INTO sender VALUE (?, ?, ?, ?)",
+            let x = await this.pool.query("INSERT INTO User VALUE (?, ?, ?, ?)",
              [null, user.email, user.password, user.username]);
            
             return x
