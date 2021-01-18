@@ -51,6 +51,8 @@ AxiosInstance.get(url)
 const axios_1 = __importDefault(require("axios"));
 const link_1 = require("./class/link");
 const downloadLink_1 = require("./class/downloadLink");
+const statistic_1 = require("./controller/statistic");
+const authentication_1 = require("./controller/authentication");
 const cheerio = require('cheerio');
 const $ = cheerio.load('<h2 class="title">Hello world</h2>');
 const url = 'https://www.data.gv.at/suche/?sort=abc'; // URL we're scraping
@@ -58,25 +60,11 @@ const AxiosInstance = axios_1.default.create(); // Create a new Axios Instance
 const csv = require('csv-parser');
 const fs = require('fs');
 const http = require('http');
+const { ensureToken } = require('./middleware');
+const jwt = require("jsonwebtoken");
 var Papa = require('papaparse');
 const results = [];
 const csvurl = 'http://data.linz.gv.at/katalog/gesundheit/akh_herkunft/AKHHER.csv';
-/*console.log(Papa.parse(csvurl, {
-    download: false,
-    step: function(row) {
-    console.log("Row:", row.data);
-  },
-  complete: function() {
-      console.log("All done!");
-  }
-}))*/
-/*fs.createReadStream(http.get('https://www.cdc.gov/coronavirus/2019-ncov/map-data-cases.csv', res => res.pipe(fs.createWriteStream('some.csv')))
-)
-  .pipe(csv())
-  .on('data', (data) => results.push(data))
-  .on('end', () => {
-    console.log(results);
-  });*/
 let links = [];
 let dl = "";
 let download = [];
@@ -89,6 +77,10 @@ const pool = mariadb.createPool({
     connectionLimit: 15
 });
 var server = express_1.default();
+const bodyParser = require('body-parser');
+server.use(bodyParser.json());
+server.use('/statistic', /* ensureToken,*/ statistic_1.StatisticController.handler());
+server.use('/authenticate', authentication_1.AuthenticationController.handler());
 server.use(express_1.default.json());
 var cors = require('cors');
 server.use(cors());
@@ -116,51 +108,6 @@ AxiosInstance.get(url)
 server.get('/api/getLinks', (req, res) => {
     res.send(links);
 });
-server.post('/api/saveStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let x = yield pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)", [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, req.body.userId]);
-        res.send(x);
-    }
-    catch (ex) {
-        res.send("error in saveStatistic \n" + ex);
-    }
-}));
-server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let x = yield pool.query("select * from Statistik");
-        res.send(x);
-    }
-    catch (ex) {
-        res.send("error in findAllStatistic \n" + ex);
-    }
-}));
-server.get('/api/clearAllStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let x = yield pool.query("delete from Statistik");
-        res.send(x);
-    }
-    catch (ex) {
-        res.send("error in clearAllStatistic \n" + ex);
-    }
-}));
-server.put('/api/updateRating', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let x = yield pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", [req.body.rating, req.body.statistikid, req.body.userid]);
-        res.send(x);
-    }
-    catch (ex) {
-        res.send("error in updateRating \n" + ex);
-    }
-}));
-server.post('/api/createRating', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        let x = yield pool.query("insert into Rating Value (?, ?, ?, ?)", [null, req.body.userid, req.body.statistikid, req.body.rating]);
-        res.send(x);
-    }
-    catch (ex) {
-        res.send("error in createRating \n" + ex);
-    }
-}));
 server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const resUrl = 'https://www.data.gv.at' + links[req.params.id].link;
     AxiosInstance.get(resUrl)
@@ -180,6 +127,15 @@ server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, voi
         res.send(download);
     })
         .catch(console.error);
+}));
+server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let x = yield pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, sum(Rating) "Rating" from Statistik s join Rating r ON s.id = r.statistikid group BY s.id');
+        res.send(x);
+    }
+    catch (ex) {
+        res.send("error in findAllStatistic \n" + ex);
+    }
 }));
 server.post('/api/download/', (req, res) => {
     const resUrl = 'https://www.data.gv.at' + req.body.link;
@@ -208,7 +164,5 @@ server.post('/api/downloadcsv/', (req, res) => {
         res.send(headers);
     })
         .catch(console.error);
-});
-server.post('/api/insertstatistic/', (req, res) => {
 });
 //# sourceMappingURL=index.js.map
