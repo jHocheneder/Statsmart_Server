@@ -16,50 +16,53 @@ export class StatisticController {
 
         router.post('/saveStatistic', async (req, res) => {
             try {
-            let x = await pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)",
-                [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, req.body.userId])
-            
-            res.send(x)
+                let x = await pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)",
+                    [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, req.body.userId])
+                
+                res.send(x)
             } catch (ex) {
-            res.send("error in saveStatistic \n" + ex)
+                res.send("error in saveStatistic \n" + ex)
             }
         });
         
         router.get('/clearAllStatistic', async (req, res) => {
             try {
-            let x = await pool.query("delete from Statistik")
-        
-            res.send(x)
+                let x = await pool.query("delete from Statistik")
+            
+                res.send(x)
             } catch (ex) {
-            res.send("error in clearAllStatistic \n" + ex)
+                res.send("error in clearAllStatistic \n" + ex)
             }
         })
         
         router.put('/updateRating', async (req, res) => {
             try {
-            let x = await pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", 
-                [req.body.rating, req.body.statistikid, req.body.userid])
-        
-            res.send(x)
+                let x = await pool.query("select * from Rating where statistikid = ? and userid = ?",
+                    [req.body.statistikid, req.body.userid])
+
+                if (x[0] == null) {
+                    x = await createRating(req.body)
+                } else {
+                    x = await pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", 
+                        [req.body.rating, req.body.statistikid, req.body.userid])
+                }
+            
+                res.send(x)
             } catch (ex) {
-            res.send("error in updateRating \n" + ex)
+                res.send("error in updateRating \n" + ex)
             }
         })
-        
-        router.post('/createRating', async (req, res) => {
+
+        async function createRating(body) {
             try {
-            let x = await pool.query("insert into Rating Value (?, ?, ?, ?)",
-                [null, req.body.userid, req.body.statistikid, req.body.rating])
-        
-            res.send(x)
+                let x = await pool.query("insert into Rating Value (?, ?, ?, ?)",
+                    [null, body.userid, body.statistikid, body.rating])
+            
+                return(x)
             } catch (ex) {
-            res.send("error in createRating \n" + ex)
+                return("error in createRating \n" + ex)
             }
-        })
-        
-        router.post('/insertstatistic/', (req, res) =>{
-        
-        })
+        }
   
 
         return router;
