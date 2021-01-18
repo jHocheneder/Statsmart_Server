@@ -62,14 +62,14 @@ var server = express();
 const bodyParser = require('body-parser')
 server.use(bodyParser.json())
 
-server.use('/statistic',/* ensureToken,*/ StatisticController.handler());
-server.use('/authenticate',  AuthenticationController.handler());
-
 server.use(express.json());
 var cors = require('cors')
 server.use(cors())
 
 const port = 8080;
+
+server.use('/statistic',/* ensureToken,*/ StatisticController.handler());
+server.use('/authenticate',  AuthenticationController.handler());
 
 server.listen(port, function(){
   console.log('API is listening on port '+port);
