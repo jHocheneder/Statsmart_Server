@@ -130,7 +130,7 @@ server.get('/api/downloadLinks/:id', async (req, res) =>{
 
 server.get('/api/findAllStatistic', async (req, res) => {
   try {
-  let x = await pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, sum(Rating) "Rating" from Statistik s join Rating r ON s.id = r.statistikid group BY s.id')
+  let x = await pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, sum(Rating) "Rating" from Statistik s left outer join Rating r ON s.id = r.statistikid group BY s.id')
 
   res.send(x)
   } catch (ex) {
