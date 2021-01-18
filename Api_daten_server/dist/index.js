@@ -79,12 +79,12 @@ const pool = mariadb.createPool({
 var server = express_1.default();
 const bodyParser = require('body-parser');
 server.use(bodyParser.json());
-server.use('/statistic', /* ensureToken,*/ statistic_1.StatisticController.handler());
-server.use('/authenticate', authentication_1.AuthenticationController.handler());
 server.use(express_1.default.json());
 var cors = require('cors');
 server.use(cors());
 const port = 8080;
+server.use('/statistic', /* ensureToken,*/ statistic_1.StatisticController.handler());
+server.use('/authenticate', authentication_1.AuthenticationController.handler());
 server.listen(port, function () {
     console.log('API is listening on port ' + port);
 });
