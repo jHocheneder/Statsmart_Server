@@ -130,7 +130,7 @@ server.get('/api/downloadLinks/:id', (req, res) => __awaiter(void 0, void 0, voi
 }));
 server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        let x = yield pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, u.username, sum(Rating) "Rating" ' +
+        let x = yield pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, u.username, nvl(sum(Rating), 0) "Rating" ' +
             'from Statistik s left outer join Rating r ON s.id = r.statistikid JOIN User u ON s.userid = u.id group BY s.id');
         res.send(x);
     }
