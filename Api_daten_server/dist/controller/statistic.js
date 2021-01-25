@@ -63,7 +63,6 @@ class StatisticController {
             try {
                 let x = yield pool.query("select * from Rating where statistikid = ? and userid = ?", [req.body.statistikid, req.body.userid]);
                 if (x[0] == null) {
-                    console.log('test');
                     x = yield createRating(req.body);
                 }
                 else {
@@ -75,18 +74,8 @@ class StatisticController {
                 res.send("error in updateRating \n" + ex);
             }
         }));
-        router.post('/createRating', (req, res) => __awaiter(this, void 0, void 0, function* () {
-            try {
-                let x = yield pool.query("insert into Rating Value (?, ?, ?, ?)", [null, req.body.userid, req.body.statistikid, req.body.rating]);
-                res.send(x);
-            }
-            catch (ex) {
-                res.send("error in createRating \n" + ex);
-            }
-        }));
         function createRating(body) {
             return __awaiter(this, void 0, void 0, function* () {
-                console.log('test5');
                 try {
                     let x = yield pool.query("insert into Rating Value (?, ?, ?, ?)", [null, body.userid, body.statistikid, body.rating]);
                     return (x);
