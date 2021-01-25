@@ -3,8 +3,6 @@ import pandas as pd
 import io
 import seaborn as sns
 import matplotlib.pyplot as plt
-import numpy as np
-from scipy.stats.stats import pearsonr
 
 url1 = "https://data.linz.gv.at/katalog/tourismus/kategorien/3_stern_beherbergungsbetriebe/2019/t3ges_2019.csv"
 url2 = "https://data.linz.gv.at/katalog/wirtschaft/arbeitslose/2019/Arbsu_2019.csv"
@@ -16,39 +14,43 @@ df1 = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
 csv_data = requests.get(url2).content
 df2 = pd.read_csv(io.StringIO(csv_data.decode('latin1')), sep=";")
 
+print(df1.head())
+
+print(df2.head())
+
 
 df = df1.merge(df2, how='inner', left_on=df1.columns[0], right_on=df2.columns[0])
 
 #dfTest = df1.merge(df, on='Mona*')
 
 
-correlation_mat = df.corr()
+#correlation_mat = df.corr()
 
-sns.heatmap(correlation_mat, annot=True)
+#sns.heatmap(correlation_mat, annot=True)
 # plt.show()
 
-corr_pairs = correlation_mat.unstack()
-sorted_pairs = corr_pairs.sort_values(kind="quicksort")
-
-negative_pairs = sorted_pairs[sorted_pairs < 0]
-strong_pairs = sorted_pairs[abs(sorted_pairs) > 0.9]
-strong_pairs = strong_pairs[:-(len(df.columns)-1)]
-
-#print(strong_pairs)
-
-keys = strong_pairs.keys()
-
-firstKey = keys[len(keys)-1][0]
-secondKey = keys[len(keys)-1][1]
-
-xKey = 'Monat'
-
-#print(firstKey + '\n' + secondKey)
-
-dfDraw = df[[firstKey, secondKey, xKey]]
-
-dfDraw.plot.line()
-plt.show()
+# corr_pairs = correlation_mat.unstack()
+# sorted_pairs = corr_pairs.sort_values(kind="quicksort")
+#
+# negative_pairs = sorted_pairs[sorted_pairs < 0]
+# strong_pairs = sorted_pairs[abs(sorted_pairs) > 0.9]
+# strong_pairs = strong_pairs[:-(len(df.columns)-1)]
+#
+# #print(strong_pairs)
+#
+# keys = strong_pairs.keys()
+#
+# firstKey = keys[len(keys)-1][0]
+# secondKey = keys[len(keys)-1][1]
+#
+# xKey = 'Monat'
+#
+# #print(firstKey + '\n' + secondKey)
+#
+# dfDraw = df[[firstKey, secondKey, xKey]]
+#
+# dfDraw.plot.line()
+# plt.show()
 
 # dfDraw = pd.DataFrame({
 #     'first': df[firstKey],

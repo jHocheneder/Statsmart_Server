@@ -36,12 +36,13 @@ print(df.corr())
 print()
 
 np.random.seed(100)
-#Erstellen Sie ein Array mit 50 zufälligen Ganzzahlen zwischen 0 und 10
+# Erstellen Sie ein Array mit 50 zufälligen Ganzzahlen zwischen 0 und 10
 var1 = np.random.randint(0, 10, 50)
-#Erstellen Sie ein positiv korreliertes Array mit zufälligem Rauschen
+# Erstellen Sie ein positiv korreliertes Array mit zufälligem Rauschen
 var2 = var1 + np.random.normal(0, 10, 50)
-#Berechnen Sie die Korrelation zwischen den beiden Arrays
-print(np.corrcoef(var1, var2)[0,1])
+# Berechnen Sie die Korrelation zwischen den beiden Arrays
+print('f')
+print(np.corrcoef(var1, var2)[0, 1])
 
 print()
 
@@ -49,5 +50,9 @@ print(pearsonr(var1, var2))
 
 data = pd.DataFrame(np.random.randint(0, 10, size=(5, 3)), columns=['A', 'B', 'C'])
 print(data)
+
+print()
+print('Test1234')
+print(data['A'])
 
 print(data['A'].corr(data['B']))
