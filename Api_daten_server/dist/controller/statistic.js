@@ -30,10 +30,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.StatisticController = void 0;
 const express_1 = require("express");
+const repository_1 = require("../repository/repository");
 const mariadb = __importStar(require("mariadb"));
 class StatisticController {
     static handler() {
         let router = express_1.Router();
+        const repo = new repository_1.Repository();
         const pool = mariadb.createPool({
             host: '195.128.100.64',
             user: 'statsmart',
@@ -43,7 +45,7 @@ class StatisticController {
         });
         router.post('/saveStatistic', (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                let x = yield pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)", [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, req.body.userId]);
+                let x = yield pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)", [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, repo.getPayload(req.headers['authorization'])]);
                 res.send(x);
             }
             catch (ex) {
@@ -61,12 +63,12 @@ class StatisticController {
         }));
         router.put('/updateRating', (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                let x = yield pool.query("select * from Rating where statistikid = ? and userid = ?", [req.body.statistikid, req.body.userid]);
+                let x = yield pool.query("select * from Rating where statistikid = ? and userid = ?", [req.body.statistikid, repo.getPayload(req.headers['authorization'])]);
                 if (x[0] == null) {
-                    x = yield createRating(req.body);
+                    x = yield createRating(repo.getPayload(req.headers['authorization']), req.body);
                 }
                 else {
-                    x = yield pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", [req.body.rating, req.body.statistikid, req.body.userid]);
+                    x = yield pool.query("update Rating set rating = ? where statistikid = ? and userid = ?", [req.body.rating, req.body.statistikid, repo.getPayload(req.headers['authorization'])]);
                 }
                 res.send(x);
             }
@@ -74,10 +76,10 @@ class StatisticController {
                 res.send("error in updateRating \n" + ex);
             }
         }));
-        function createRating(body) {
+        function createRating(id, body) {
             return __awaiter(this, void 0, void 0, function* () {
                 try {
-                    let x = yield pool.query("insert into Rating Value (?, ?, ?, ?)", [null, body.userid, body.statistikid, body.rating]);
+                    let x = yield pool.query("insert into Rating Value (?, ?, ?, ?)", [null, id, body.statistikid, body.rating]);
                     return (x);
                 }
                 catch (ex) {

@@ -83,7 +83,7 @@ server.use(express_1.default.json());
 var cors = require('cors');
 server.use(cors());
 const port = 8080;
-server.use('/statistic', /* ensureToken,*/ statistic_1.StatisticController.handler());
+server.use('/statistic', ensureToken, statistic_1.StatisticController.handler());
 server.use('/authenticate', authentication_1.AuthenticationController.handler());
 server.listen(port, function () {
     console.log('API is listening on port ' + port);

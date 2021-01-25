@@ -68,7 +68,7 @@ server.use(cors())
 
 const port = 8080;
 
-server.use('/statistic',/* ensureToken,*/ StatisticController.handler());
+server.use('/statistic', ensureToken, StatisticController.handler());
 server.use('/authenticate',  AuthenticationController.handler());
 
 server.listen(port, function(){
