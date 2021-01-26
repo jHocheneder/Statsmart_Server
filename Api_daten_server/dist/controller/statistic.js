@@ -46,7 +46,9 @@ class StatisticController {
         router.post('/saveStatistic', (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 let x = yield pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)", [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, repo.getPayload(req.headers['authorization'])]);
-                res.send(x);
+                let y = yield pool.query("INSERT INTO File VALUE (?, ?, ?, ?, ?, ?)", [null, req.body.link1, req.body.xValue, req.body.yValue1, req.body.yTitle1, x.insertId]);
+                let z = yield pool.query("INSERT INTO File VALUE (?, ?, ?, ?, ?, ?)", [null, req.body.link2, req.body.xValue, req.body.yValue2, req.body.yTitle2, x.insertId]);
+                res.send(x + y + z);
             }
             catch (ex) {
                 res.send("error in saveStatistic \n" + ex);
