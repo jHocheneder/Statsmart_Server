@@ -24,7 +24,7 @@ export class StatisticController {
                     [null, req.body.link1, req.body.xValue, req.body.yValue1, req.body.yTitle1, x.insertId])
 
                 let z = await pool.query("INSERT INTO File VALUE (?, ?, ?, ?, ?, ?)",
-                [null, req.body.link2, req.body.xValue, req.body.yValue2, req.body.yTitle2, x.insertId])
+                    [null, req.body.link2, req.body.xValue, req.body.yValue2, req.body.yTitle2, x.insertId])
                 
                 res.send(x)
             } catch (ex) {

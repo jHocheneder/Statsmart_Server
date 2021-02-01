@@ -53,6 +53,7 @@ const link_1 = require("./class/link");
 const downloadLink_1 = require("./class/downloadLink");
 const statistic_1 = require("./controller/statistic");
 const authentication_1 = require("./controller/authentication");
+const decoder = require('iconv-lite');
 const cheerio = require('cheerio');
 const $ = cheerio.load('<h2 class="title">Hello world</h2>');
 const url = 'https://www.data.gv.at/suche/?sort=abc'; // URL we're scraping
@@ -138,6 +139,16 @@ server.get('/api/findAllStatistic', (req, res) => __awaiter(void 0, void 0, void
         res.send("error in findAllStatistic \n" + ex);
     }
 }));
+server.get('/api/getLinksForStatistics/:id', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        let x = yield pool.query('SELECT f1.link "link1", f2.link "link2", f1.xValue, f1.yTitle "yTitle1", f1.yValue "yValue1", f2.yTitle "yTitle2", f2.yValue "yValue2" FROM (SELECT * FROM File WHERE statistikid = ? ORDER BY id DESC LIMIT 1) AS f1,' +
+            '(SELECT * FROM File WHERE statistikid = ? ORDER BY id ASC LIMIT 1) AS f2;', [req.params.id, req.params.id]);
+        res.send(x);
+    }
+    catch (ex) {
+        res.send("error in getLinksForStatistics \n" + ex);
+    }
+}));
 server.post('/api/download/', (req, res) => {
     const resUrl = 'https://www.data.gv.at' + req.body.link;
     AxiosInstance.get(resUrl)
@@ -156,14 +167,25 @@ server.post('/api/downloadcsv/', (req, res) => {
     const csvlink = req.body.link;
     AxiosInstance.get(csvlink)
         .then(response => {
+        //const html2 = decoder.decode(response.data, 'iso88591');
         const html2 = response.data;
         const headers = [];
-        const parsecsv = Papa.parse(html2);
+        console.log(response.headers['content-type']);
+        console.log(html2);
+        const parsecsv = Papa.parse(html2, {
+            encoding: "utf-8"
+        });
+        console.log(parsecsv);
         for (let i = 0; i < parsecsv.data.length; i++) {
             headers.push(parsecsv.data[i]);
         }
         res.send(headers);
     })
         .catch(console.error);
+    let response = axios_1.default.request({
+        method: 'GET',
+        url: req.body.link,
+        responseType: 'arraybuffer'
+    });
 });
 //# sourceMappingURL=index.js.map

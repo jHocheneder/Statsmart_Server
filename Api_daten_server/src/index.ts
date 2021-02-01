@@ -23,6 +23,8 @@ import { Link } from './class/link';
 import { DownloadLink } from './class/downloadLink';
 import { StatisticController } from './controller/statistic';
 import { AuthenticationController } from './controller/authentication';
+
+const decoder = require('iconv-lite')
 const cheerio = require('cheerio')
 const $ = cheerio.load('<h2 class="title">Hello world</h2>')
 
@@ -130,12 +132,23 @@ server.get('/api/downloadLinks/:id', async (req, res) =>{
 
 server.get('/api/findAllStatistic', async (req, res) => {
   try {
-  let x = await pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, u.username, nvl(sum(Rating), 0) "Rating" '+
-  'from Statistik s left outer join Rating r ON s.id = r.statistikid JOIN User u ON s.userid = u.id group BY s.id')
+    let x = await pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, u.username, nvl(sum(Rating), 0) "Rating" '+
+    'from Statistik s left outer join Rating r ON s.id = r.statistikid JOIN User u ON s.userid = u.id group BY s.id')
 
-  res.send(x)
+    res.send(x)
   } catch (ex) {
-  res.send("error in findAllStatistic \n" + ex)
+    res.send("error in findAllStatistic \n" + ex)
+  }
+})
+
+server.get('/api/getLinksForStatistics/:id', async (req, res) => {
+  try {
+    let x = await pool.query('SELECT f1.link "link1", f2.link "link2", f1.xValue, f1.yTitle "yTitle1", f1.yValue "yValue1", f2.yTitle "yTitle2", f2.yValue "yValue2" FROM (SELECT * FROM File WHERE statistikid = ? ORDER BY id DESC LIMIT 1) AS f1,' + 
+    '(SELECT * FROM File WHERE statistikid = ? ORDER BY id ASC LIMIT 1) AS f2;', [req.params.id, req.params.id])
+
+    res.send(x)
+  } catch (ex) {
+    res.send("error in getLinksForStatistics \n" + ex)
   }
 })
 
@@ -166,10 +179,19 @@ server.post('/api/downloadcsv/', (req, res) =>{
   AxiosInstance.get(csvlink)
   .then( 
     response => {
-        const html2 = response.data;
+        //const html2 = decoder.decode(response.data, 'iso88591');
+        const html2 = response.data
         const headers = []
 
-        const parsecsv = Papa.parse(html2)
+        console.log(response.headers['content-type'])
+        console.log(html2)
+
+        const parsecsv = Papa.parse(html2, {
+          encoding: "utf-8"
+        })
+
+        console.log(parsecsv)
+
         for(let i = 0; i < parsecsv.data.length; i++){
           headers.push(parsecsv.data[i])
         }
@@ -177,5 +199,11 @@ server.post('/api/downloadcsv/', (req, res) =>{
     }
   )
   .catch(console.error);
+
+  let response = axios.request({
+    method: 'GET',
+    url: req.body.link,
+    responseType: 'arraybuffer'
+  })
 })
 
