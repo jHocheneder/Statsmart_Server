@@ -53,7 +53,7 @@ const link_1 = require("./class/link");
 const downloadLink_1 = require("./class/downloadLink");
 const statistic_1 = require("./controller/statistic");
 const authentication_1 = require("./controller/authentication");
-const decoder = require('iconv-lite');
+const encoder = require('iconv-lite');
 const cheerio = require('cheerio');
 const $ = cheerio.load('<h2 class="title">Hello world</h2>');
 const url = 'https://www.data.gv.at/suche/?sort=abc'; // URL we're scraping
@@ -167,9 +167,10 @@ server.post('/api/downloadcsv/', (req, res) => {
     const csvlink = req.body.link;
     AxiosInstance.get(csvlink)
         .then(response => {
-        //const html2 = decoder.decode(response.data, 'iso88591');
+        //const html2 = encoder.encode(response.data, 'iso 8859-1')
         const html2 = response.data;
         const headers = [];
+        console.log(encoder.encodingExists('iso 8859-1'));
         console.log(response.headers['content-type']);
         console.log(html2);
         const parsecsv = Papa.parse(html2, {

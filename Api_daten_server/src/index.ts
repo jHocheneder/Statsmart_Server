@@ -24,7 +24,7 @@ import { DownloadLink } from './class/downloadLink';
 import { StatisticController } from './controller/statistic';
 import { AuthenticationController } from './controller/authentication';
 
-const decoder = require('iconv-lite')
+const encoder = require('iconv-lite')
 const cheerio = require('cheerio')
 const $ = cheerio.load('<h2 class="title">Hello world</h2>')
 
@@ -179,23 +179,25 @@ server.post('/api/downloadcsv/', (req, res) =>{
   AxiosInstance.get(csvlink)
   .then( 
     response => {
-        //const html2 = decoder.decode(response.data, 'iso88591');
-        const html2 = response.data
-        const headers = []
+      //const html2 = encoder.encode(response.data, 'iso 8859-1')
+      const html2 = response.data
+      const headers = []
 
-        console.log(response.headers['content-type'])
-        console.log(html2)
+      console.log(encoder.encodingExists('iso 8859-1'))
 
-        const parsecsv = Papa.parse(html2, {
-          encoding: "utf-8"
-        })
+      console.log(response.headers['content-type'])
+      console.log(html2)
 
-        console.log(parsecsv)
+      const parsecsv = Papa.parse(html2, {
+        encoding: "utf-8"
+      })
 
-        for(let i = 0; i < parsecsv.data.length; i++){
-          headers.push(parsecsv.data[i])
-        }
-        res.send(headers)
+      console.log(parsecsv)
+
+      for(let i = 0; i < parsecsv.data.length; i++){
+        headers.push(parsecsv.data[i])
+      }
+      res.send(headers)
     }
   )
   .catch(console.error);

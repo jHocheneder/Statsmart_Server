@@ -15,6 +15,17 @@ export class StatisticController {
             connectionLimit: 15
           });
 
+        router.get('/findStatisticsByUser', async (req, res) => {
+            try {
+                let x = await pool.query("SELECT * from Statistik where userid = ?", 
+                    [repo.getPayload(req.headers['authorization'])])
+
+                res.send(x)
+            } catch (ex) {
+                res.send("error in findStatisticsByUser \n" + ex)
+            }
+        })
+
         router.post('/saveStatistic', async (req, res) => {
             try {
                 let x = await pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)",

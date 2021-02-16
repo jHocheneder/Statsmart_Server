@@ -43,6 +43,15 @@ class StatisticController {
             database: 'statsmart',
             connectionLimit: 15
         });
+        router.get('/findStatisticsByUser', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                let x = yield pool.query("SELECT * from Statistik where userid = ?", [repo.getPayload(req.headers['authorization'])]);
+                res.send(x);
+            }
+            catch (ex) {
+                res.send("error in findStatisticsByUser \n" + ex);
+            }
+        }));
         router.post('/saveStatistic', (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 let x = yield pool.query("INSERT INTO Statistik VALUE (?, ?, ?, ?, ?, ?, ?)", [null, req.body.title, req.body.chartType, req.body.errorRate, req.body.xTitle, req.body.description, repo.getPayload(req.headers['authorization'])]);
