@@ -12,7 +12,7 @@ export class StatisticController {
             user: 'statsmart',
             password: 'Statsmart_01',
             database: 'statsmart',
-            connectionLimit: 15
+            connectionLimit: 35
           });
 
         router.get('/findStatisticsByUser', async (req, res) => {
