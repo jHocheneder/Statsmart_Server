@@ -41,8 +41,26 @@ class StatisticController {
             user: 'statsmart',
             password: 'Statsmart_01',
             database: 'statsmart',
-            connectionLimit: 15
+            connectionLimit: 35
         });
+        router.get('/getUserData', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                let x = yield pool.query("select email, username from User where id = ?", [repo.getPayload(req.headers['authorization'])]);
+                res.send(x);
+            }
+            catch (ex) {
+                console.log("error in getUserData " + ex);
+            }
+        }));
+        router.post('/updateUserData', (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                let x = yield pool.query("update User set username = ?, password = ? where id = ?", [req.body.username, req.body.password, repo.getPayload(req.headers['authorization'])]);
+                res.send(x);
+            }
+            catch (ex) {
+                console.log("error in updateUserData " + ex);
+            }
+        }));
         router.get('/findStatisticsByUser', (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 let x = yield pool.query("SELECT * from Statistik where userid = ?", [repo.getPayload(req.headers['authorization'])]);

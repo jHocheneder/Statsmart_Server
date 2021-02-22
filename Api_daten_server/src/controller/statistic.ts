@@ -15,6 +15,26 @@ export class StatisticController {
             connectionLimit: 35
           });
 
+        router.get('/getUserData', async (req, res) => {
+            try {
+                let x = await pool.query("select email, username from User where id = ?", [repo.getPayload(req.headers['authorization'])])
+
+                res.send(x);
+            } catch (ex) {
+                console.log("error in getUserData "+ex)
+            }
+        })
+
+        router.post('/updateUserData', async (req, res) => {
+            try {
+                let x = await pool.query("update User set username = ?, password = ? where id = ?", [req.body.username, req.body.password, repo.getPayload(req.headers['authorization'])])
+
+                res.send(x)
+            } catch (ex) {
+                console.log("error in updateUserData "+ex)
+            }
+        })
+
         router.get('/findStatisticsByUser', async (req, res) => {
             try {
                 let x = await pool.query("SELECT * from Statistik where userid = ?", 
@@ -80,8 +100,7 @@ export class StatisticController {
             } catch (ex) {
                 return("error in createRating \n" + ex)
             }
-        }
-  
+        }  
 
         return router;
     }
