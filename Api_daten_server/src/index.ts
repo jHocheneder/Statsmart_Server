@@ -18,13 +18,13 @@ AxiosInstance.get(url)
   )
   .catch(console.error);*/
 
-import axios from 'axios';
 import { Link } from './class/link';
 import { DownloadLink } from './class/downloadLink';
 import { StatisticController } from './controller/statistic';
 import { AuthenticationController } from './controller/authentication';
 
-const encoder = require('iconv-lite')
+const Iconv = require('iconv').Iconv
+const axios = require('axios')
 const cheerio = require('cheerio')
 const $ = cheerio.load('<h2 class="title">Hello world</h2>')
 
@@ -176,17 +176,27 @@ server.post('/api/download/', (req, res) =>{
 
 server.post('/api/downloadcsv/', (req, res) =>{
   const csvlink = req.body.link
-  AxiosInstance.get(csvlink)
+  AxiosInstance({
+    method: 'GET',
+    url: csvlink,
+    responseType: 'arraybuffer',
+    responseEncoding: 'binary'
+  })
   .then( 
     response => {
-      //const html2 = encoder.encode(response.data, 'iso 8859-1')
-      const html2 = response.data
+      let iconv = new Iconv('Windows-1250', 'UTF-8')
+      let buffer = iconv.convert(Buffer.from(response.data))
+
+      console.log(buffer.toString())
+      let html2 = buffer.toString()
+      //const html2 = Iconv.encode(response.data, 'iso 8859-1')
+      //const html2 = response.data
       const headers = []
 
-      console.log(encoder.encodingExists('iso 8859-1'))
+      /*console.log(encoder.encodingExists('iso 8859-1'))
 
       console.log(response.headers['content-type'])
-      console.log(html2)
+      console.log(html2)*/
 
       const parsecsv = Papa.parse(html2, {
         encoding: "utf-8"

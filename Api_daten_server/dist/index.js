@@ -48,16 +48,17 @@ AxiosInstance.get(url)
     }
   )
   .catch(console.error);*/
-const axios_1 = __importDefault(require("axios"));
 const link_1 = require("./class/link");
 const downloadLink_1 = require("./class/downloadLink");
 const statistic_1 = require("./controller/statistic");
 const authentication_1 = require("./controller/authentication");
-const encoder = require('iconv-lite');
+const Iconv = require('iconv-lite');
+const utf8 = require('utf8');
+const axios = require('axios');
 const cheerio = require('cheerio');
 const $ = cheerio.load('<h2 class="title">Hello world</h2>');
 const url = 'https://www.data.gv.at/suche/?sort=abc'; // URL we're scraping
-const AxiosInstance = axios_1.default.create(); // Create a new Axios Instance
+const AxiosInstance = axios.create(); // Create a new Axios Instance
 const csv = require('csv-parser');
 const fs = require('fs');
 const http = require('http');
@@ -165,14 +166,25 @@ server.post('/api/download/', (req, res) => {
 });
 server.post('/api/downloadcsv/', (req, res) => {
     const csvlink = req.body.link;
-    AxiosInstance.get(csvlink)
+    AxiosInstance({
+        method: 'GET',
+        url: csvlink,
+        responseType: 'arraybuffer',
+        responseEncoding: 'binary'
+    })
         .then(response => {
-        //const html2 = encoder.encode(response.data, 'iso 8859-1')
-        const html2 = response.data;
+        /*let iconv = new Iconv('Windows-1250', 'UTF-8')
+        let buffer = iconv.convert(Buffer.from(response.data))*/
+        let buffer = utf8.decode(response.data);
+        console.log(buffer.toString());
+        let html2 = buffer.toString();
+        //const html2 = Iconv.encode(response.data, 'iso 8859-1')
+        //const html2 = response.data
         const headers = [];
-        console.log(encoder.encodingExists('iso 8859-1'));
-        console.log(response.headers['content-type']);
-        console.log(html2);
+        /*console.log(encoder.encodingExists('iso 8859-1'))
+  
+        console.log(response.headers['content-type'])
+        console.log(html2)*/
         const parsecsv = Papa.parse(html2, {
             encoding: "utf-8"
         });
@@ -183,7 +195,7 @@ server.post('/api/downloadcsv/', (req, res) => {
         res.send(headers);
     })
         .catch(console.error);
-    let response = axios_1.default.request({
+    let response = axios.request({
         method: 'GET',
         url: req.body.link,
         responseType: 'arraybuffer'
