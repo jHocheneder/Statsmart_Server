@@ -38,7 +38,7 @@ export class StatisticController {
         router.get('/findStatisticsByUser', async (req, res) => {
             try {
                 let x = await pool.query('SELECT s.id, title, chartType, errorRate, xTitle, description, s.userId, u.username, nvl(sum(Rating), 0) "Rating" ' + 
-                                    'from Statistik s left outer join Rating r ON s.id = r.statistikid JOIN User u ON s.userid = u.id WHERE s.userid = 5 group BY s.id',
+                                    'from Statistik s left outer join Rating r ON s.id = r.statistikid JOIN User u ON s.userid = u.id WHERE s.userid = ? group BY s.id',
                     [repo.getPayload(req.headers['authorization'])])
 
                 res.send(x)
